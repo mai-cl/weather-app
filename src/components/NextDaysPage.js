@@ -10,40 +10,22 @@ import {
   styled,
   Typography,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import AirIcon from '@mui/icons-material/Air'
+import { useEffect } from 'react'
 import WeatherIcon from './WeatherIcon'
 import moment from 'moment'
-
-const url = process.env.REACT_APP_WEATHERAPI_URL
-const apiKey = process.env.REACT_APP_WEATHERAPI_API_KEY
-const location = 'Chubut'
+import { useAppState } from '../context'
+import { fetchWeatherData } from '../actions'
+import RainDropsIcon from './RainDropsIcon'
+import parseWeatherIcon from '../helpers/parseWeatherIcon'
 
 const NextDaysPage = () => {
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const { store, dispatch } = useAppState()
+  const { data, loading, error, location } = store
 
   useEffect(() => {
-    fetch(
-      `${url}/forecast.json?key=${apiKey}&q=${location}&aqi=no&days=3&alerts=no`
-    )
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        setData(data)
-        setLoading(false)
-      })
-      .catch(error => {
-        setError(error)
-      })
-  }, [])
-
-  const parseWeatherIcon = url =>
-    url
-      .replace('.png', '')
-      .replace('//cdn.weatherapi.com/weather/64x64/', '')
-      .replace('night/', '')
-      .replace('day/', '')
+    dispatch(fetchWeatherData(location))
+  }, [location])
 
   const renderDaysWeather = () => {
     const days = data.forecast.forecastday
@@ -51,7 +33,7 @@ const NextDaysPage = () => {
     return (
       <List sx={{ width: '100%' }}>
         {days.map(day => (
-          <ListItem button divider sx={{ gap: '8px' }}>
+          <ListItem button divider sx={{ gap: '8px' }} key={day.date}>
             <ListItemText
               primary={moment(day.date).format('ddd D')}
               sx={{ flex: 1 }}
@@ -63,7 +45,7 @@ const NextDaysPage = () => {
                   <StyledSpan>{`/${day.day.mintemp_c}°`}</StyledSpan>
                 </Typography>
               }
-              sx={{ flex: 1 }}
+              sx={{ flex: 1.5 }}
             />
             <Box sx={{ display: 'flex', gap: '8px', flex: 4 }}>
               <ListItemIcon sx={{ minWidth: 'fit-content' }}>
@@ -75,14 +57,28 @@ const NextDaysPage = () => {
               </ListItemIcon>
               <ListItemText primary={day.day.condition.text} />
             </Box>
-            <ListItemText
-              primary={day.day.daily_chance_of_rain + '%'}
-              sx={{ flex: 1 }}
-            />
-            <ListItemText
-              primary={day.day.maxwind_kph + ' km/h'}
-              sx={{ flex: 1 }}
-            />
+            <Box
+              sx={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <RainDropsIcon color='primary' sx={{ fontSize: '1.9rem' }} />
+              <ListItemText primary={day.day.daily_chance_of_rain + '%'} />
+            </Box>
+            <Box
+              sx={{
+                flex: 2,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <AirIcon color='primary' fontSize='small' />
+              <ListItemText primary={day.day.maxwind_kph + ' km/h'} />
+            </Box>
           </ListItem>
         ))}
       </List>

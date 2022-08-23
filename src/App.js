@@ -1,13 +1,17 @@
 import { CssBaseline } from '@mui/material'
+
 import Header from './components/Header'
 import Navbar from './components/Navbar'
+import { StateProvider } from './context'
 
 function App() {
   return (
     <>
       <CssBaseline />
-      <Header />
-      <Navbar />
+      <StateProvider>
+        <Header />
+        <Navbar />
+      </StateProvider>
     </>
   )
 }

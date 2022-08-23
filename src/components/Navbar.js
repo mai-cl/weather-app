@@ -1,6 +1,6 @@
 import { Box, Container, Tab, Tabs } from '@mui/material'
 import PropTypes from 'prop-types'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import HourlyPage from './HourlyPage'
 import NextDaysPage from './NextDaysPage'
 import TodayPage from './TodayPage'
@@ -11,6 +11,7 @@ const Navbar = () => {
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
+
   return (
     <Container>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>

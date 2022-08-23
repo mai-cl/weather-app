@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@mui/material'
 import { Search } from '@mui/icons-material'
+import { useState } from 'react'
 
 const SearchBox = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -51,6 +52,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }))
 
 const Header = () => {
+  const [inputLocation, setInputLocation] = useState('')
+
   return (
     <AppBar
       position='static'
@@ -59,15 +62,17 @@ const Header = () => {
       <Container>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant='h6' noWrap component='div'>
-            Wheater App
+            Weather App
           </Typography>
           <SearchBox>
             <SearchIconWrapper>
               <Search />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder='Search…'
+              placeholder='Search'
               inputProps={{ 'aria-label': 'search' }}
+              value={inputLocation}
+              onChange={e => setInputLocation(e.target.value)}
             />
           </SearchBox>
           <Switch defaultChecked={false} color='secondary' />

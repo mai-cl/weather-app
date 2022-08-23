@@ -5,37 +5,20 @@ import {
   CircularProgress,
   Typography,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { fetchWeatherData } from '../actions'
+import { useAppState } from '../context'
+import parseWeatherIcon from '../helpers/parseWeatherIcon'
+
 import WeatherIcon from './WeatherIcon'
 
-const url = process.env.REACT_APP_WEATHERAPI_URL
-const apiKey = process.env.REACT_APP_WEATHERAPI_API_KEY
-const location = 'Chubut'
-
 const TodayPage = () => {
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const { store, dispatch } = useAppState()
+  const { data, loading, error, location } = store
 
   useEffect(() => {
-    fetch(`${url}/current.json?key=${apiKey}&q=${location}`)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        setData(data)
-        setLoading(false)
-      })
-      .catch(error => {
-        setError(error)
-      })
-  }, [])
-
-  const parseWeatherIcon = url =>
-    url
-      .replace('.png', '')
-      .replace('//cdn.weatherapi.com/weather/64x64/', '')
-      .replace('night/', '')
-      .replace('day/', '')
+    dispatch(fetchWeatherData(location))
+  }, [location])
 
   const renderContent = () => {
     const {
@@ -86,16 +69,18 @@ const TodayPage = () => {
   }
 
   return (
-    <Card
-      sx={{
-        display: 'flex',
-        maxWidth: '768px',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
-    >
-      {data && renderContent()}
-    </Card>
+    <>
+      <Card
+        sx={{
+          display: 'flex',
+          maxWidth: '768px',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        {data && renderContent()}
+      </Card>
+    </>
   )
 }
 
