@@ -1,9 +1,7 @@
 import { Box, Container, Tab, Tabs } from '@mui/material'
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
-import HourlyPage from './HourlyPage'
-import NextDaysPage from './NextDaysPage'
-import TodayPage from './TodayPage'
+import { Link as RouterLink } from 'react-router-dom'
 
 const Navbar = () => {
   const [value, setValue] = useState(0)
@@ -13,27 +11,33 @@ const Navbar = () => {
   }
 
   return (
-    <Container>
+    <Container component='nav' sx={{ marginBottom: '20px', marginTop: '20px' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={value}
           onChange={handleChange}
           aria-label='basic tabs example'
         >
-          <Tab label='Today' {...a11yProps(0)} />
-          <Tab label='Hourly' {...a11yProps(1)} />
-          <Tab label='3 Day' {...a11yProps(2)} />
+          <Tab
+            label='Today'
+            {...a11yProps(0)}
+            to='/today'
+            component={RouterLink}
+          />
+          <Tab
+            label='Hourly'
+            {...a11yProps(1)}
+            to='/hourly'
+            component={RouterLink}
+          />
+          <Tab
+            label='3 Day'
+            {...a11yProps(2)}
+            to='/days'
+            component={RouterLink}
+          />
         </Tabs>
       </Box>
-      <TabPanel value={value} index={0}>
-        <TodayPage />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <HourlyPage />
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        <NextDaysPage />
-      </TabPanel>
     </Container>
   )
 }
