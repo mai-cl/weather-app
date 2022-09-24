@@ -18,6 +18,7 @@ import { useAppState } from '../context'
 import { fetchWeatherData } from '../actions'
 import RainDropsIcon from './RainDropsIcon'
 import parseWeatherIcon from '../helpers/parseWeatherIcon'
+import { InvertColors, LightMode, Shower } from '@mui/icons-material'
 
 const NextDaysPage = () => {
   const { store, dispatch } = useAppState()
@@ -28,60 +29,84 @@ const NextDaysPage = () => {
   }, [location])
 
   const renderDaysWeather = () => {
-    const days = data.forecast.forecastday
+    const days = data.forecast.forecastday.map(day => ({
+      date: day.date,
+      maxTempC: day.day.maxtemp_c,
+      minTempC: day.day.mintemp_c,
+      condition: day.day.condition.text,
+      weatherIcon: parseWeatherIcon(day.day.condition.icon),
+      details: [
+        {
+          property: 'Rain',
+          icon: <Shower color='primary' fontSize='small' />,
+          value: day.day.daily_chance_of_rain.toString().concat('%'),
+        },
+        {
+          property: 'Wind',
+          icon: <AirIcon color='primary' fontSize='small' />,
+          value: day.day.maxwind_kph.toString().concat(' km/h'),
+        },
+        {
+          property: 'UV',
+          icon: <LightMode color='primary' fontSize='small' />,
+          value: day.day.uv.toString().concat(' of 10'),
+        },
+        {
+          property: 'Humidity',
+          icon: <InvertColors color='primary' fontSize='small' />,
+          value: day.day.avghumidity.toString().concat('%'),
+        },
+      ],
+    }))
 
     return (
-      <List sx={{ width: '100%' }}>
+      <Box sx={{ display: 'flex', gap: 2 }}>
         {days.map(day => (
-          <ListItem button divider sx={{ gap: '8px' }} key={day.date}>
-            <ListItemText
-              primary={moment(day.date).format('ddd D')}
-              sx={{ flex: 1 }}
+          <Card
+            variant='outlined'
+            sx={{
+              maxWidth: '100%',
+              width: '240px',
+              padding: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+            key={day.date}
+          >
+            <Typography variant='h5' component='h2' textAlign='center'>
+              {moment(day.date).format('ddd D')}
+            </Typography>
+            <WeatherIcon
+              isDay={true}
+              iconNumber={day.weatherIcon}
+              size={64}
+              block
             />
-            <ListItemText
-              primary={
-                <Typography variant='h6' component='span'>
-                  {`${day.day.maxtemp_c}°`}
-                  <StyledSpan>{`/${day.day.mintemp_c}°`}</StyledSpan>
-                </Typography>
-              }
-              sx={{ flex: 1.5 }}
-            />
-            <Box sx={{ display: 'flex', gap: '8px', flex: 4 }}>
-              <ListItemIcon sx={{ minWidth: 'fit-content' }}>
-                <WeatherIcon
-                  isDay={true}
-                  iconNumber={parseWeatherIcon(day.day.condition.icon)}
-                  size={32}
-                />
-              </ListItemIcon>
-              <ListItemText primary={day.day.condition.text} />
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              <RainDropsIcon color='primary' sx={{ fontSize: '1.9rem' }} />
-              <ListItemText primary={day.day.daily_chance_of_rain + '%'} />
-            </Box>
-            <Box
-              sx={{
-                flex: 2,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              <AirIcon color='primary' fontSize='small' />
-              <ListItemText primary={day.day.maxwind_kph + ' km/h'} />
-            </Box>
-          </ListItem>
+            <Typography variant='h6' component='span'>
+              {`${day.maxTempC}°`}
+              <StyledSpan>{`/${day.minTempC}°`}</StyledSpan>
+            </Typography>
+
+            <Typography mb={2}>{day.condition}</Typography>
+            {day.details.map(data => (
+              <Box
+                width='100%'
+                display='flex'
+                justifyContent='space-between'
+                alignItems='center'
+                key={data.property}
+              >
+                <Box component='span' display='inline-flex' alignItems='center'>
+                  {data.icon}
+                  <Typography>{data.property}</Typography>
+                </Box>
+                <Typography>{data.value}</Typography>
+              </Box>
+            ))}
+          </Card>
         ))}
-      </List>
+      </Box>
     )
   }
 
@@ -96,16 +121,11 @@ const NextDaysPage = () => {
   if (error) {
     return <p>{JSON.stringify(error)}</p>
   }
+
   return (
-    <Card
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        maxWidth: '768px',
-      }}
-    >
+    <Card sx={{ width: 'fit-content', maxWidth: '100%' }}>
       <CardContent>
-        <Typography component='h1' variant='h5'>
+        <Typography component='h1' variant='h5' mb={3}>
           3 Day Weather
           <StyledSpan>
             {' '}
@@ -113,9 +133,8 @@ const NextDaysPage = () => {
             {data.location.country}
           </StyledSpan>
         </Typography>
+        {renderDaysWeather()}
       </CardContent>
-
-      {renderDaysWeather()}
     </Card>
   )
 }
