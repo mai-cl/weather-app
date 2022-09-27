@@ -60,6 +60,7 @@ const HourlyItem = ({
             isDay={isDay}
             iconNumber={parseWeatherIcon(conditionIcon)}
             size={32}
+            block={false}
           />
         </ListItemIcon>
         <ListItemText primary={conditionText} />
