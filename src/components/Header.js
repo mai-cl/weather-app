@@ -5,8 +5,6 @@ import {
   Container,
   Icon,
   InputAdornment,
-  InputBase,
-  styled,
   Switch,
   TextField,
   Toolbar,
@@ -16,60 +14,15 @@ import {
 } from '@mui/material'
 import { Search } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
-import { fetchWeatherData, setLocation } from '../actions'
+import { setLocationUrl } from '../actions'
 import { useAppState } from '../context'
+import { useNavigate } from 'react-router-dom'
 
 const url = process.env.REACT_APP_WEATHERAPI_URL
 const apiKey = process.env.REACT_APP_WEATHERAPI_API_KEY
 
-/* const SearchBox = styled('form')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(3),
-    width: 'auto',
-  },
-})) */
-
-/* const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-})) */
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch',
-    },
-  },
-}))
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  width: '320px',
-  '& > div': {
-    backgroundColor: '#fff',
-  },
-}))
-
 const Header = () => {
+  const navigate = useNavigate()
   const theme = useTheme()
   const matchesLg = useMediaQuery(theme.breakpoints.up('lg'))
   const { dispatch } = useAppState()
@@ -97,7 +50,10 @@ const Header = () => {
       .then(response => response.json())
       .then(data => {
         setOptions(
-          data.map(item => `${item.name}, ${item.region} - ${item.country}`)
+          data.map(item => ({
+            label: `${item.name}, ${item.region}, ${item.country}`,
+            url: item.url,
+          }))
         )
       })
       .catch(error => {
@@ -105,16 +61,17 @@ const Header = () => {
       })
   }, [debouncedLocation])
 
-  const handleSearchLocation = e => {
-    e.preventDefault()
-    console.log('handleSearchLocation', inputLocation)
-
-    dispatch(setLocation(inputLocation))
-  }
-
-  const handleChangeValue = (event, value) => {
+  const handleChangeValue = (event, value, reason) => {
     if (!value) return
-    dispatch(setLocation(value))
+
+    if (reason === 'createOption') {
+      navigate(`/today/${value}`)
+      dispatch(setLocationUrl(value))
+      return
+    }
+
+    navigate(`/today/${value.url}`)
+    dispatch(setLocationUrl(value.url))
   }
 
   const handleChangeInput = (event, value) => {
@@ -131,11 +88,7 @@ const Header = () => {
           <Typography variant='h6' noWrap component='div'>
             Weather App
           </Typography>
-          <Box
-            sx={{ flex: '0 1 480px' }}
-            component='form'
-            onSubmit={handleSearchLocation}
-          >
+          <Box sx={{ flex: '0 1 480px' }}>
             <Autocomplete
               size={matchesLg ? 'medium' : 'small'}
               options={options}

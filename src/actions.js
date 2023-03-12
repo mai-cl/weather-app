@@ -15,12 +15,11 @@ const setWeatherData = data => ({
   payload: data,
 })
 
-export const setLocation = location => ({
-  type: 'WEATHER_SET_LOCATION',
-  payload: location,
+export const setLocationUrl = locationUrl => ({
+  type: 'WEATHER_SET_LOCATION_URL',
+  payload: locationUrl,
 })
 
-// TODO: Agregar parametro "getState"?
 export const fetchWeatherData = location => dispatch => {
   dispatch(startWeatherLoading())
   fetch(

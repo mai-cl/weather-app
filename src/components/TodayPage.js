@@ -14,7 +14,6 @@ import {
   CardContent,
   CardHeader,
   CircularProgress,
-  Grid,
   List,
   ListItem,
   ListItemIcon,
@@ -25,19 +24,40 @@ import {
 } from '@mui/material'
 import { useEffect } from 'react'
 import moment from 'moment'
-import { fetchWeatherData } from '../actions'
+import { fetchWeatherData, setLocationUrl } from '../actions'
 import { useAppState } from '../context'
 import parseWeatherIcon from '../helpers/parseWeatherIcon'
 
 import WeatherIcon from './WeatherIcon'
+import { useParams } from 'react-router-dom'
 
 const TodayPage = () => {
   const { store, dispatch } = useAppState()
-  const { data, loading, error, location } = store
+
+  const { data, loading, error } = store
+  const { locationUrl } = useParams()
 
   useEffect(() => {
-    dispatch(fetchWeatherData(location))
-  }, [location])
+    if (locationUrl) {
+      dispatch(setLocationUrl(locationUrl))
+      return dispatch(fetchWeatherData(locationUrl))
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        dispatch(
+          fetchWeatherData(
+            `${position.coords.latitude},${position.coords.longitude}`
+          )
+        )
+      },
+      error => {
+        console.log(
+          'Please enable the permissions for know your location or just search a specific location'
+        )
+      }
+    )
+  }, [locationUrl, dispatch])
 
   const renderContent = () => {
     const {

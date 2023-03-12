@@ -13,7 +13,8 @@ import moment from 'moment'
 import { useAppState } from '../context'
 
 import HourlyList from './HourlyList'
-import { fetchWeatherData } from '../actions'
+import { fetchWeatherData, setLocationUrl } from '../actions'
+import { useParams } from 'react-router-dom'
 
 const StyledSpan = styled('span')(({ theme }) => ({
   fontSize: theme.typography.body1.fontSize,
@@ -21,18 +22,37 @@ const StyledSpan = styled('span')(({ theme }) => ({
 
 const HourlyPage = () => {
   const { store, dispatch } = useAppState()
-  const { data, loading, error, location } = store
+  const { data, loading, error } = store
+
+  const { locationUrl } = useParams()
 
   useEffect(() => {
-    dispatch(fetchWeatherData(location))
-  }, [location])
+    if (locationUrl) {
+      dispatch(setLocationUrl(locationUrl))
+      return dispatch(fetchWeatherData(locationUrl))
+    }
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        dispatch(
+          fetchWeatherData(
+            `${position.coords.latitude},${position.coords.longitude}`
+          )
+        )
+      },
+      error => {
+        console.log(
+          'Please enable the permissions for know your location or just search a specific location'
+        )
+      }
+    )
+  }, [locationUrl, dispatch])
 
   const renderHourlyWeather = () => {
     const days = data.forecast.forecastday
     return (
       <List>
         {days.map(day => (
-          <Day key={day.date} day={day} location={location} />
+          <Day key={day.date} day={day} />
         ))}
       </List>
     )

@@ -20,9 +20,15 @@ function App() {
           <Routes>
             <Route path='/' element={<MainContent />}>
               <Route index element={<Navigate replace to='/today' />} />
-              <Route path='/today' element={<TodayPage />} />
-              <Route path='/hourly' element={<HourlyPage />} />
-              <Route path='/days' element={<NextDaysPage />} />
+              <Route path='today' element={<TodayPage />}>
+                <Route path=':locationUrl' element={<TodayPage />} />
+              </Route>
+              <Route path='hourly' element={<HourlyPage />}>
+                <Route path=':locationUrl' element={<HourlyPage />} />
+              </Route>
+              <Route path='days' element={<NextDaysPage />}>
+                <Route path=':locationUrl' element={<NextDaysPage />} />
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>

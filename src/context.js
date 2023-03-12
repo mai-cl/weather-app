@@ -1,5 +1,5 @@
 import { isFunction } from 'lodash'
-import { createContext, useContext, useReducer } from 'react'
+import { createContext, useCallback, useContext, useReducer } from 'react'
 import { weatherData } from './reducers'
 
 const StateContext = createContext()
@@ -7,19 +7,22 @@ const StateContext = createContext()
 const useThunkReducer = (reducer, initialState) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const enhancedDispatch = action => {
-    if (isFunction(action)) {
-      action(dispatch)
-    } else {
-      dispatch(action)
-    }
-  }
+  const enhancedDispatch = useCallback(
+    action => {
+      if (isFunction(action)) {
+        action(dispatch)
+      } else {
+        dispatch(action)
+      }
+    },
+    [dispatch]
+  )
 
   return [state, enhancedDispatch]
 }
 
 const initialState = {
-  location: 'Guyana',
+  locationUrl: '',
   data: null,
   loading: true,
   error: null,

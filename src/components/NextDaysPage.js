@@ -3,10 +3,6 @@ import {
   Card,
   CardContent,
   CircularProgress,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   styled,
   Typography,
 } from '@mui/material'
@@ -15,18 +11,39 @@ import { useEffect } from 'react'
 import WeatherIcon from './WeatherIcon'
 import moment from 'moment'
 import { useAppState } from '../context'
-import { fetchWeatherData } from '../actions'
-import RainDropsIcon from './RainDropsIcon'
+import { fetchWeatherData, setLocationUrl } from '../actions'
+
 import parseWeatherIcon from '../helpers/parseWeatherIcon'
 import { InvertColors, LightMode, Shower } from '@mui/icons-material'
 
+import { useParams } from 'react-router-dom'
+
 const NextDaysPage = () => {
   const { store, dispatch } = useAppState()
-  const { data, loading, error, location } = store
+
+  const { data, loading, error } = store
+  const { locationUrl } = useParams()
 
   useEffect(() => {
-    dispatch(fetchWeatherData(location))
-  }, [location])
+    if (locationUrl) {
+      dispatch(setLocationUrl(locationUrl))
+      return dispatch(fetchWeatherData(locationUrl))
+    }
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        dispatch(
+          fetchWeatherData(
+            `${position.coords.latitude},${position.coords.longitude}`
+          )
+        )
+      },
+      error => {
+        console.log(
+          'Please enable the permissions for know your location or just search a specific location'
+        )
+      }
+    )
+  }, [locationUrl, dispatch])
 
   const renderDaysWeather = () => {
     const days = data.forecast.forecastday.map(day => ({

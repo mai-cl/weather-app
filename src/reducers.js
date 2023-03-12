@@ -14,10 +14,10 @@ export const weatherData = (state, action) => {
         data: action.payload,
         loading: false,
       }
-    case 'WEATHER_SET_LOCATION':
+    case 'WEATHER_SET_LOCATION_URL':
       return {
         ...state,
-        location: action.payload,
+        locationUrl: action.payload,
       }
     default:
       return state
