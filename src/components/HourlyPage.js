@@ -4,59 +4,27 @@ import {
   CardContent,
   CircularProgress,
   List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   styled,
   Typography,
 } from '@mui/material'
-import React, { useEffect } from 'react'
+import AirIcon from '@mui/icons-material/Air'
+import React from 'react'
 import moment from 'moment'
 
-import { useAppState } from '../context'
-
-import HourlyList from './HourlyList'
-import { fetchWeatherData, setLocationUrl } from '../actions'
-import { useParams } from 'react-router-dom'
+import RainDropsIcon from './RainDropsIcon'
+import parseWeatherIcon from '../helpers/parseWeatherIcon'
+import WeatherIcon from './WeatherIcon'
+import useWeatherData from '../hooks/useWeatherData'
 
 const StyledSpan = styled('span')(({ theme }) => ({
   fontSize: theme.typography.body1.fontSize,
 }))
 
 const HourlyPage = () => {
-  const { store, dispatch } = useAppState()
-  const { data, loading, error } = store
-
-  const { locationUrl } = useParams()
-
-  useEffect(() => {
-    if (locationUrl) {
-      dispatch(setLocationUrl(locationUrl))
-      return dispatch(fetchWeatherData(locationUrl))
-    }
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        dispatch(
-          fetchWeatherData(
-            `${position.coords.latitude},${position.coords.longitude}`
-          )
-        )
-      },
-      error => {
-        console.log(
-          'Please enable the permissions for know your location or just search a specific location'
-        )
-      }
-    )
-  }, [locationUrl, dispatch])
-
-  const renderHourlyWeather = () => {
-    const days = data.forecast.forecastday
-    return (
-      <List>
-        {days.map(day => (
-          <Day key={day.date} day={day} />
-        ))}
-      </List>
-    )
-  }
+  const { data, loading, error } = useWeatherData()
 
   if (loading) {
     return (
@@ -88,22 +56,88 @@ const HourlyPage = () => {
           </StyledSpan>
         </Typography>
       </CardContent>
-
-      {renderHourlyWeather()}
+      <List>
+        {data.forecast.forecastday.map(day => (
+          <Day key={day.date} {...day} />
+        ))}
+      </List>
     </Card>
   )
 }
 
-const Day = ({ day }) => {
+const Day = ({ date, hour }) => {
   return (
     <li>
       <CardContent>
         <Typography component='h2' variant='h6' color='GrayText'>
-          {moment(day.date).format('dddd, MMMM DD')}
+          {moment(date).format('dddd, MMMM DD')}
         </Typography>
       </CardContent>
-      <HourlyList hours={day.hour} date={day.date} />
+
+      <List sx={{ width: '100%' }}>
+        {hour.map(hour => (
+          <Hour key={hour.time} {...hour} date={date} />
+        ))}
+      </List>
     </li>
+  )
+}
+
+const Hour = ({
+  date,
+  time,
+  temp_c,
+  is_day,
+  condition,
+  chance_of_rain,
+  wind_dir,
+  wind_kph,
+}) => {
+  return (
+    <ListItem divider sx={{ gap: '8px' }}>
+      <ListItemText primary={time.replace(date, '').trim()} sx={{ flex: 1 }} />
+      <ListItemText
+        primary={
+          <Typography variant='h6' component='span'>
+            {temp_c + '°'}
+          </Typography>
+        }
+        sx={{ flex: 1 }}
+      />
+      <Box sx={{ display: 'flex', gap: '8px', flex: 4 }}>
+        <ListItemIcon sx={{ minWidth: 'fit-content' }}>
+          <WeatherIcon
+            isDay={is_day}
+            iconNumber={parseWeatherIcon(condition.icon)}
+            size={32}
+            block={false}
+          />
+        </ListItemIcon>
+        <ListItemText primary={condition.text} />
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          flex: 1,
+          gap: '8px',
+        }}
+      >
+        <RainDropsIcon color='primary' sx={{ fontSize: '1.9rem' }} />
+        <ListItemText primary={chance_of_rain + '%'} />
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          flex: 2,
+          alignItems: 'center',
+          gap: '8px',
+        }}
+      >
+        <AirIcon color='primary' fontSize='small' />
+        <ListItemText primary={wind_dir + ' ' + wind_kph + ' km/h'} />
+      </Box>
+    </ListItem>
   )
 }
 

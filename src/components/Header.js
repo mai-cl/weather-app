@@ -90,6 +90,7 @@ const Header = () => {
           </Typography>
           <Box sx={{ flex: '0 1 480px' }}>
             <Autocomplete
+              blurOnSelect
               size={matchesLg ? 'medium' : 'small'}
               options={options}
               freeSolo

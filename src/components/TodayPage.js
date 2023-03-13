@@ -22,42 +22,17 @@ import {
   styled,
   Typography,
 } from '@mui/material'
-import { useEffect } from 'react'
+
 import moment from 'moment'
-import { fetchWeatherData, setLocationUrl } from '../actions'
-import { useAppState } from '../context'
+
 import parseWeatherIcon from '../helpers/parseWeatherIcon'
 
 import WeatherIcon from './WeatherIcon'
-import { useParams } from 'react-router-dom'
+
+import useWeatherData from '../hooks/useWeatherData'
 
 const TodayPage = () => {
-  const { store, dispatch } = useAppState()
-
-  const { data, loading, error } = store
-  const { locationUrl } = useParams()
-
-  useEffect(() => {
-    if (locationUrl) {
-      dispatch(setLocationUrl(locationUrl))
-      return dispatch(fetchWeatherData(locationUrl))
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        dispatch(
-          fetchWeatherData(
-            `${position.coords.latitude},${position.coords.longitude}`
-          )
-        )
-      },
-      error => {
-        console.log(
-          'Please enable the permissions for know your location or just search a specific location'
-        )
-      }
-    )
-  }, [locationUrl, dispatch])
+  const { data, loading, error } = useWeatherData()
 
   const renderContent = () => {
     const {
