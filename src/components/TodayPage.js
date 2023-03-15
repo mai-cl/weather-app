@@ -150,14 +150,17 @@ const TodayPage = () => {
             sx={{
               display: 'flex',
               flexWrap: 'wrap',
-              justifyContent: 'space-between',
             }}
           >
             {details.map(detail => (
               <ListItem
                 divider
                 key={detail.property}
-                sx={{ display: 'flex', flexBasis: '49%' }}
+                sx={{
+                  display: 'flex',
+                  flex: '1 1 50%',
+                  minWidth: '360px',
+                }}
               >
                 <ListItemIcon
                   sx={{ minWidth: 'fit-content', flex: '0 1 auto', mr: 2 }}
@@ -182,7 +185,7 @@ const TodayPage = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Box display='flex' justifyContent='center'>
         <CircularProgress />
       </Box>
     )

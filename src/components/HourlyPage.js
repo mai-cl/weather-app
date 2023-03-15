@@ -9,6 +9,7 @@ import {
   ListItemText,
   styled,
   Typography,
+  useMediaQuery,
 } from '@mui/material'
 import AirIcon from '@mui/icons-material/Air'
 import React from 'react'
@@ -28,7 +29,7 @@ const HourlyPage = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Box display='flex' justifyContent='center'>
         <CircularProgress />
       </Box>
     )
@@ -93,18 +94,23 @@ const Hour = ({
   wind_dir,
   wind_kph,
 }) => {
+  const matches = useMediaQuery('(min-width:768px)')
+
   return (
     <ListItem divider sx={{ gap: '8px' }}>
-      <ListItemText primary={time.replace(date, '').trim()} sx={{ flex: 1 }} />
+      <ListItemText
+        primary={time.replace(date, '').trim()}
+        sx={{ flex: '0 0 60px' }}
+      />
       <ListItemText
         primary={
           <Typography variant='h6' component='span'>
             {temp_c + '°'}
           </Typography>
         }
-        sx={{ flex: 1 }}
+        sx={{ flex: '0 0 60px' }}
       />
-      <Box sx={{ display: 'flex', gap: '8px', flex: 4 }}>
+      <Box display='flex' gap='8px' flex='1 1 auto' mr='auto'>
         <ListItemIcon sx={{ minWidth: 'fit-content' }}>
           <WeatherIcon
             isDay={is_day}
@@ -113,26 +119,20 @@ const Hour = ({
             block={false}
           />
         </ListItemIcon>
-        <ListItemText primary={condition.text} />
+        <ListItemText
+          primary={condition.text}
+          sx={!matches ? { display: 'none' } : null}
+        />
       </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          flex: 1,
-          gap: '8px',
-        }}
-      >
+      <Box display='flex' alignItems='center' flex='0 0 80px' gap='8px'>
         <RainDropsIcon color='primary' sx={{ fontSize: '1.9rem' }} />
         <ListItemText primary={chance_of_rain + '%'} />
       </Box>
       <Box
-        sx={{
-          display: 'flex',
-          flex: 2,
-          alignItems: 'center',
-          gap: '8px',
-        }}
+        display={matches ? 'flex' : 'none'}
+        flex='0 0 180px'
+        alignItems='center'
+        gap='8px'
       >
         <AirIcon color='primary' fontSize='small' />
         <ListItemText primary={wind_dir + ' ' + wind_kph + ' km/h'} />

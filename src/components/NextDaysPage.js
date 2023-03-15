@@ -5,6 +5,7 @@ import {
   CircularProgress,
   styled,
   Typography,
+  useMediaQuery,
 } from '@mui/material'
 import AirIcon from '@mui/icons-material/Air'
 
@@ -18,6 +19,8 @@ import useWeatherData from '../hooks/useWeatherData'
 
 const NextDaysPage = () => {
   const { data, loading, error } = useWeatherData()
+
+  const matches = useMediaQuery('(min-width:768px)')
 
   const renderDaysWeather = () => {
     const days = data.forecast.forecastday.map(day => ({
@@ -51,50 +54,69 @@ const NextDaysPage = () => {
     }))
 
     return (
-      <Box sx={{ display: 'flex', gap: 2 }}>
+      <Box display='flex' gap={2} flexWrap='wrap' width='100%'>
         {days.map(day => (
           <Card
             variant='outlined'
             sx={{
-              maxWidth: '100%',
-              width: '240px',
-              padding: 3,
+              padding: '40px 20px',
+              maxWidth: matches ? '270px' : 'auto',
+              flex: matches ? '1 1 auto' : '1 1 100%',
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: matches ? 'column' : 'row',
+              gap: matches ? 0 : 3,
               alignItems: 'center',
             }}
             key={day.date}
           >
-            <Typography variant='h5' component='h2' textAlign='center'>
-              {moment(day.date).format('ddd D')}
-            </Typography>
-            <WeatherIcon
-              isDay={true}
-              iconNumber={day.weatherIcon}
-              size={64}
-              block
-            />
-            <Typography variant='h6' component='span'>
-              {`${day.maxTempC}°`}
-              <StyledSpan>{`/${day.minTempC}°`}</StyledSpan>
-            </Typography>
+            <Box
+              display='flex'
+              flexDirection='column'
+              alignItems='center'
+              rowGap={1}
+              mb={matches ? 1 : 0}
+              flex={matches ? 'initial' : '1'}
+            >
+              <Typography variant='h5' component='h2' textAlign='center'>
+                {moment(day.date).format('ddd D')}
+              </Typography>
+              <WeatherIcon
+                isDay={true}
+                iconNumber={day.weatherIcon}
+                size={64}
+                block
+              />
+              <Typography variant='h6' component='span'>
+                {`${day.maxTempC}°`}
+                <StyledSpan>{`/${day.minTempC}°`}</StyledSpan>
+              </Typography>
 
-            <Typography mb={2}>{day.condition}</Typography>
-            {day.details.map(data => (
-              <Box
-                width='100%'
-                display='flex'
-                justifyContent='space-between'
-                alignItems='center'
-                key={data.property}
-              >
-                <Box component='span' display='inline-flex' alignItems='center'>
-                  {data.icon}
-                  <Typography>{data.property}</Typography>
+              <Typography mb={2} textAlign='center'>
+                {day.condition}
+              </Typography>
+            </Box>
+            <Box width='100%' flex={matches ? 'initial' : '3'}>
+              {day.details.map(data => (
+                <Box
+                  width='100%'
+                  display='flex'
+                  justifyContent='space-between'
+                  alignItems='center'
+                  mb={1}
+                  key={data.property}
+                >
+                  <Box
+                    component='span'
+                    display='inline-flex'
+                    alignItems='center'
+                  >
+                    {data.icon}
+                    <Typography ml={1}>{data.property}</Typography>
+                  </Box>
+                  <Typography>{data.value}</Typography>
                 </Box>
-                <Typography>{data.value}</Typography>
-              </Box>
-            ))}
+              ))}
+            </Box>
           </Card>
         ))}
       </Box>
@@ -103,7 +125,7 @@ const NextDaysPage = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Box display='flex' justifyContent='center'>
         <CircularProgress />
       </Box>
     )
@@ -114,7 +136,7 @@ const NextDaysPage = () => {
   }
 
   return (
-    <Card sx={{ width: 'fit-content', maxWidth: '100%' }}>
+    <Card sx={{ width: '100%' }}>
       <CardContent>
         <Typography component='h1' variant='h5' mb={3}>
           3 Day Weather

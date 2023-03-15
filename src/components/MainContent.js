@@ -4,7 +4,7 @@ import { Outlet as RouterOutlet } from 'react-router-dom'
 
 const MainContent = () => {
   return (
-    <Container component='main'>
+    <Container component='main' sx={{ marginBottom: 6 }}>
       <RouterOutlet />
     </Container>
   )

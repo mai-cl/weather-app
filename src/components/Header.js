@@ -5,7 +5,6 @@ import {
   Container,
   Icon,
   InputAdornment,
-  Switch,
   TextField,
   Toolbar,
   Typography,
@@ -17,14 +16,16 @@ import { useEffect, useState } from 'react'
 import { setLocationUrl } from '../actions'
 import { useAppState } from '../context'
 import { useNavigate } from 'react-router-dom'
+import ToggleThemeSwitch from './ToggleThemeSwitch'
 
 const url = process.env.REACT_APP_WEATHERAPI_URL
 const apiKey = process.env.REACT_APP_WEATHERAPI_API_KEY
 
-const Header = () => {
+const Header = ({ toggleThemeColor, themeColor }) => {
   const navigate = useNavigate()
   const theme = useTheme()
   const matchesLg = useMediaQuery(theme.breakpoints.up('lg'))
+  const matches768px = useMediaQuery('(min-width: 768px)')
   const { dispatch } = useAppState()
   const [debouncedLocation, setDebouncedLocation] = useState('')
   const [inputLocation, setInputLocation] = useState('')
@@ -50,9 +51,10 @@ const Header = () => {
       .then(response => response.json())
       .then(data => {
         setOptions(
-          data.map(item => ({
+          data.map((item, index) => ({
             label: `${item.name}, ${item.region}, ${item.country}`,
             url: item.url,
+            key: item.url + index,
           }))
         )
       })
@@ -84,11 +86,27 @@ const Header = () => {
       sx={{ height: { lg: 80 }, justifyContent: 'center' }}
     >
       <Container>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant='h6' noWrap component='div'>
+        <Toolbar
+          sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}
+        >
+          <Typography
+            variant='h5'
+            component='a'
+            href='/'
+            sx={{
+              textDecoration: 'none',
+              '&:visited': {
+                color: 'currentcolor',
+              },
+            }}
+            align='left'
+            lineHeight={!matches768px ? '1.2' : null}
+            fontSize={!matches768px ? '1rem' : null}
+          >
             Weather App
           </Typography>
-          <Box sx={{ flex: '0 1 480px' }}>
+
+          <Box sx={{ flex: '0 1 420px' }}>
             <Autocomplete
               blurOnSelect
               size={matchesLg ? 'medium' : 'small'}
@@ -97,6 +115,13 @@ const Header = () => {
               filterOptions={(options, state) => options}
               onChange={handleChangeValue}
               onInputChange={handleChangeInput}
+              renderOption={(props, option) => {
+                return (
+                  <li {...props} key={option.key}>
+                    {option.label}
+                  </li>
+                )
+              }}
               renderInput={params => (
                 <TextField
                   {...params}
@@ -122,7 +147,11 @@ const Header = () => {
               )}
             />
           </Box>
-          <Switch defaultChecked={false} color='secondary' />
+
+          <ToggleThemeSwitch
+            checked={themeColor === 'dark'}
+            onChange={toggleThemeColor}
+          />
         </Toolbar>
       </Container>
     </AppBar>
