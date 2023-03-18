@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertTitle,
   Box,
   Card,
   CardContent,
@@ -6,6 +8,7 @@ import {
   styled,
   Typography,
   useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import AirIcon from '@mui/icons-material/Air'
 
@@ -19,8 +22,10 @@ import useWeatherData from '../hooks/useWeatherData'
 
 const NextDaysPage = () => {
   const { data, loading, error } = useWeatherData()
+  const theme = useTheme()
 
-  const matches = useMediaQuery('(min-width:768px)')
+  const matches768pSize = useMediaQuery('(max-width:768px)')
+  const matchesSmSize = useMediaQuery(theme.breakpoints.down('sm'))
 
   const renderDaysWeather = () => {
     const days = data.forecast.forecastday.map(day => ({
@@ -60,12 +65,24 @@ const NextDaysPage = () => {
             variant='outlined'
             sx={{
               padding: '40px 20px',
-              maxWidth: matches ? '270px' : 'auto',
-              flex: matches ? '1 1 auto' : '1 1 100%',
+              maxWidth: '270px',
+              flex: '1 1 auto',
               display: 'flex',
-              flexDirection: matches ? 'column' : 'row',
-              gap: matches ? 0 : 3,
+              flexDirection: 'column',
+              gap: 0,
               alignItems: 'center',
+              ...(matches768pSize && {
+                maxWidth: 'auto',
+                flex: '1 1 100%',
+                flexDirection: 'row',
+                gap: 3,
+              }),
+              ...(matchesSmSize && {
+                width: '100%',
+                flex: '1 1 auto',
+                flexDirection: 'column',
+                gap: 0,
+              }),
             }}
             key={day.date}
           >
@@ -74,8 +91,8 @@ const NextDaysPage = () => {
               flexDirection='column'
               alignItems='center'
               rowGap={1}
-              mb={matches ? 1 : 0}
-              flex={matches ? 'initial' : '1'}
+              mb={matches768pSize ? 0 : 1}
+              flex={matches768pSize ? '1' : 'initial'}
             >
               <Typography variant='h5' component='h2' textAlign='center'>
                 {moment(day.date).format('ddd D')}
@@ -95,7 +112,7 @@ const NextDaysPage = () => {
                 {day.condition}
               </Typography>
             </Box>
-            <Box width='100%' flex={matches ? 'initial' : '3'}>
+            <Box width='100%' flex={matches768pSize ? '3' : 'initial'}>
               {day.details.map(data => (
                 <Box
                   width='100%'
@@ -132,7 +149,12 @@ const NextDaysPage = () => {
   }
 
   if (error) {
-    return <p>{JSON.stringify(error)}</p>
+    return (
+      <Alert severity='error'>
+        <AlertTitle>Error</AlertTitle>
+        {error.message}
+      </Alert>
+    )
   }
 
   return (

@@ -13,6 +13,7 @@ export const weatherData = (state, action) => {
         ...state,
         data: action.payload,
         loading: false,
+        error: null,
       }
     case 'WEATHER_SET_LOCATION_URL':
       return {

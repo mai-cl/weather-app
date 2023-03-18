@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertTitle,
   Box,
   Card,
   CardContent,
@@ -36,7 +38,12 @@ const HourlyPage = () => {
   }
 
   if (error) {
-    return <p>{JSON.stringify(error)}</p>
+    return (
+      <Alert severity='error'>
+        <AlertTitle>Error</AlertTitle>
+        {error.message}
+      </Alert>
+    )
   }
 
   return (

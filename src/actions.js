@@ -27,9 +27,14 @@ export const fetchWeatherData = location => dispatch => {
   )
     .then(response => response.json())
     .then(data => {
+      if (data.error) throw new Error(data.error.message)
       dispatch(setWeatherData(data))
     })
     .catch(error => {
-      dispatch(setWeatherError(error))
+      dispatch(
+        setWeatherError({
+          message: error.message,
+        })
+      )
     })
 }
