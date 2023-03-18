@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { styled, Box } from '@mui/material'
+import { styled } from '@mui/material'
 
 import daySprite from '../icons/weather-icons/daySprite.svg'
 import nightSprite from '../icons/weather-icons/nightSprite.svg'
