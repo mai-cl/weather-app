@@ -1,6 +1,7 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Error404 from './components/Error404'
 
 import Header from './components/Header'
 import HourlyPage from './components/HourlyPage'
@@ -45,6 +46,7 @@ function App() {
                 <Route path=':locationUrl' element={<NextDaysPage />} />
               </Route>
             </Route>
+            <Route path='*' element={<Error404 />} />
           </Routes>
         </BrowserRouter>
       </StateProvider>
